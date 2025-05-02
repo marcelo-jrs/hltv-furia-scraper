@@ -17,7 +17,7 @@ def get_soup(url):
     driver = webdriver.Chrome(service=service, options=options)
     
     driver.get(url)
-    time.sleep(3)
+    time.sleep(10)
     soup = BeautifulSoup(driver.page_source, "html.parser")
     return soup, driver
 
