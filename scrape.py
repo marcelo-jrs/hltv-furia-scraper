@@ -1,21 +1,22 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import json
 import time
 
 def get_soup(url):
-    service = Service('/usr/local/bin/chromedriver')
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless=new")  # New headless mode
+    options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--remote-debugging-port=9222")
-    options.add_argument("--user-data-dir=/tmp/chrome-user-data")
     
+    # Automatic driver management
+    service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=options)
-    driver.get(url)
     
+    driver.get(url)
     time.sleep(3)
     soup = BeautifulSoup(driver.page_source, "html.parser")
     return soup, driver
