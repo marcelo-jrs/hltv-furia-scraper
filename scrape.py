@@ -26,7 +26,7 @@ def get_roster(url):
     try:
         soup, driver = get_soup(url)
         roster = []
-        coach_section = soup.find("table", class_="coach-table")
+        coach_section = soup.find("div", class_="teamCoach-wrapper")
         coach_name = coach_section.find("div", class_="text-ellipsis").text.strip()
         coach_img = coach_section.find("img", class_="playerBox-bodyshot")['src']
         roster.append({
