@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import json
 
 def get_soup(url):
-    service = Service('./chromedriver-win64/chromedriver.exe')
+    service = Service('./chromedriver-linux64/chromedriver.exe')
     driver = webdriver.Chrome(service=service)
     driver.get(url)
 
