@@ -33,7 +33,6 @@ def get_soup(url):
 def get_roster(url):
     try:
         soup, driver = get_soup(url)
-        print(soup)
         roster = []
         coach_section = soup.find("div", class_="teamCoach-wrapper")
         coach_name = coach_section.find("div", class_="text-ellipsis").text.strip()
