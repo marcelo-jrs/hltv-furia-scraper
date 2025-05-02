@@ -10,7 +10,6 @@ def get_soup(url):
     options = Options()
     options.add_argument("--headless")  # Run in background
     options.add_argument("--no-sandbox")  # Needed for Linux
-    options.add_argument("--disable-dev-shm-usage")  # For Docker/CI environments
     
     # Auto-download ChromeDriver
     driver = webdriver.Chrome(
