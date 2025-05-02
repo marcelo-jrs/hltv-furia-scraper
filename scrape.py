@@ -8,44 +8,65 @@ import time
 
 def get_soup(url):
     options = Options()
-    options.add_argument("--headless")  # Run in background
-    options.add_argument("--no-sandbox")  # Needed for Linux
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
     
-    # Auto-download ChromeDriver
     driver = webdriver.Chrome(
         service=Service(ChromeDriverManager().install()),
         options=options
     )
     driver.get(url)
-    time.sleep(3)
+    time.sleep(5)  # Increased wait time
+    
+    # Debug: Save page source
+    with open("page.html", "w", encoding="utf-8") as f:
+        f.write(driver.page_source)
+    
     soup = BeautifulSoup(driver.page_source, "html.parser")
+    print(soup)
     return soup, driver
 
 
 def get_roster(url):
     soup, driver = get_soup(url)
     roster = []
+    # Coach section with error handling
     coach_section = soup.find("table", class_="coach-table")
-    coach_name = coach_section.find("div", class_="text-ellipsis").text.strip()
-    coach_img = coach_section.find("img", class_="playerBox-bodyshot")['src']
-    roster.append({
-        "name": coach_name,
-        "role": "coach",
-        "img": coach_img
-    })
+    if coach_section:
+        try:
+            coach_name = coach_section.find("div", class_="text-ellipsis").text.strip()
+            coach_img = coach_section.find("img", class_="playerBox-bodyshot")['src']
+            roster.append({
+                "name": coach_name,
+                "role": "coach",
+                "img": coach_img
+            })
+        except Exception as e:
+            print(f"Error parsing coach: {e}")
+    
+    # Players section with error handling
     players_section = soup.find("table", class_="players-table")
-    for player in players_section.find("tbody").find_all("tr"):
-        first_cell = player.find("td", class_="playersBox-first-cell")
-        name = first_cell.find("div", class_="text-ellipsis").text.strip()
-        img = first_cell.find("img", class_="playerBox-bodyshot")['src']
-        status = player.find("div", class_="player-status").text.strip()
-        roster.append({
-            "name": name,
-            "role": "player",
-            "img": img,
-            "status": status
-        })
-    driver.quit() 
+    if players_section:
+        tbody = players_section.find("tbody")
+        if tbody:
+            for player in tbody.find_all("tr"):
+                try:
+                    first_cell = player.find("td", class_="playersBox-first-cell")
+                    if first_cell:
+                        name = first_cell.find("div", class_="text-ellipsis").text.strip()
+                        img = first_cell.find("img", class_="playerBox-bodyshot")['src']
+                        status = player.find("div", class_="player-status").text.strip()
+                        roster.append({
+                            "name": name,
+                            "role": "player",
+                            "img": img,
+                            "status": status
+                        })
+                except Exception as e:
+                    print(f"Error parsing player: {e}")
+    
+    driver.quit()
     return roster
 
 def get_events(url):
