@@ -20,13 +20,14 @@ jobs:
 
       - name: Install ChromeDriver
         run: |
-          # Using specific ChromeDriver version for Chrome I used 132
-          CHROMEDRIVER_VERSION="132.0.6834.83"
-          echo "Installing ChromeDriver version: $CHROMEDRIVER_VERSION"
-          wget -q "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/$CHROMEDRIVER_VERSION/linux64/chromedriver-linux64.zip"
-          unzip chromedriver-linux64.zip
-          chmod +x chromedriver-linux64/chromedriver
-          sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
+          # Get latest Chrome version matching the stable package
+          CHROME_VERSION=$(google-chrome --version | awk '{print $3}')
+          CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION%.*}")
+          echo "Installing ChromeDriver $CHROMEDRIVER_VERSION for Chrome $CHROME_VERSION"
+          wget -q "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
+          unzip chromedriver_linux64.zip
+          sudo mv chromedriver /usr/local/bin/
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
