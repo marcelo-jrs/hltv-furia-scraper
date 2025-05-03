@@ -10,10 +10,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Chrome and dependencies
+      - name: Install Chrome
         run: |
           sudo apt-get update
-          sudo apt-get install -y chromium-browser chromium-driver
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run scraper
@@ -23,6 +27,12 @@ jobs:
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
+          
           git add data.json
-          git commit -m "Update scraped data"
-          git push
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes to commit"
+          else
+            git commit -m "Auto-update: $(date +'%Y-%m-%d %H:%M:%S')"
+            git push
+            echo "Changes committed and pushed"
+          fi
